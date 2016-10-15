@@ -1,0 +1,25 @@
+{
+  "name": "lens-calc",
+  "authors": [
+    "alex-andrews <mr.alex.aka@gmail.com>"
+  ],
+  "description": "A lens calculator",
+  "main": "src/Lens.js",
+  "keywords": [
+    "optics",
+    "lens",
+    "calculator"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies" : {
+    "jasmine": "https://github.com/jasmine/jasmine.git"
+  }
+}
