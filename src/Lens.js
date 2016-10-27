@@ -1,7 +1,7 @@
 class Lens { // eslint-disable-line no-unused-vars
   constructor (lensIndex, baseCurve, spherePower, diameter, minThickness) {
     if (arguments.length !== 5) {
-      throw new Error('Lens requires 5 arguments at instantiation, recieved ' + arguments.length)
+      throw new Error(`Lens requires 5 arguments at instantiation, recieved ${arguments.length}`)
     } else if (
       typeof (lensIndex) !== 'number' ||
       typeof (baseCurve) !== 'number' ||
@@ -71,7 +71,7 @@ class Lens { // eslint-disable-line no-unused-vars
   }
   curvatureCalc (lensIndex, power) {
     if (typeof (lensIndex) !== 'number' || typeof (power) !== 'number') {
-      throw new Error('curvatureCalc requires numerical parameters, not ' + typeof (lensIndex) + ', ' + typeof (power))
+      throw new Error(`curvatureCalc requires numerical parameters, not ${typeof lensIndex}, ${typeof power}`)
     } else if (power === 0) {
       return Infinity
     } else if (lensIndex <= 0) {
@@ -82,7 +82,7 @@ class Lens { // eslint-disable-line no-unused-vars
   }
   surfacePowerCalc (lensIndex, curvature) {
     if (typeof (lensIndex) !== 'number' || typeof (curvature) !== 'number') {
-      throw new Error('surfacePowerCalc requires numerical parameters, not ' + typeof (lensIndex) + ', ' + typeof (curvature))
+      throw new Error(`surfacePowerCalc requires numerical parameters, not ${typeof lensIndex}, ${typeof curvature}`)
     } else if (curvature <= 0) {
       throw new Error('surfacePowerCalc requires curvature > 0')
     } else if (lensIndex <= 0) {
@@ -93,7 +93,7 @@ class Lens { // eslint-disable-line no-unused-vars
   }
   sagCalc (curvature, blankDiameter) {
     if (typeof (curvature) !== 'number' || typeof (blankDiameter) !== 'number') {
-      throw new Error('sagCalc requires numerical parameters, not ' + typeof (curvature) + ', ' + typeof (blankDiameter))
+      throw new Error(`sagCalc requires numerical parameters, not ${typeof curvature}, ${typeof blankDiameter}`)
     } else if (blankDiameter === 0) {
       throw new Error('sagCalc requires non-zero blank size')
     } else if (curvature === Infinity || curvature === 0) {
