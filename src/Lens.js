@@ -23,8 +23,8 @@ class Lens { // eslint-disable-line no-unused-vars
   set index (i) {
     if (typeof (i) !== 'number') {
       throw new Error('index assignment requires numerical input')
-    } else if (i < 1 || i > 2) {
-      throw new Error('setIndex parameter cannot be < 1 or > 2')
+    } else if (i < 1.49 || i > 2) {
+      throw new Error('setIndex parameter cannot be < 1.49 or > 2')
     } else {
       this._index = i
     }

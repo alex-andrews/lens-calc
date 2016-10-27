@@ -24,9 +24,9 @@ describe('Lens', function () {
       expect(function () { lens.index = 'string' })
       .toThrow(new Error('index assignment requires numerical input'))
     })
-    it('should throw an error if the value is < 1', function () {
+    it('should throw an error if the value is < 1.49', function () {
       expect(() => { lens.index = 0.5 })
-      .toThrow(new Error('setIndex parameter cannot be < 1 or > 2'))
+      .toThrow(new Error('setIndex parameter cannot be < 1.49 or > 2'))
     })
     it('should throw an error if the value is > 2', function () {
       expect(() => { lens.index = 3 })
@@ -248,7 +248,7 @@ describe('Lens', function () {
   })
   describe('Lens extreme value assignment', function () {
     it('should return numerical values for all lens parameters at lowest extreme', function () {
-      lens = new Lens(1, 0, -20, 40, 1.5)
+      lens = new Lens(1.498, 0, -20, 40, 1.5)
       expect(isNumeric(lens.backPower)).toBe(true)
       expect(isNumeric(lens.backSag)).toBe(true)
       expect(isNumeric(lens.frontPower)).toBe(true)
@@ -256,7 +256,7 @@ describe('Lens', function () {
       expect(isNumeric(lens.maxThickness)).toBe(true)
     })
     it('should return numerical values for all lens parameters at highest extreme', function () {
-      lens = new Lens(2, 20, 20, 53, 1.5)
+      lens = new Lens(1.498, 25, 20, 40, 1.5)
       expect(isNumeric(lens.backPower)).toBe(true)
       expect(isNumeric(lens.backSag)).toBe(true)
       expect(isNumeric(lens.frontPower)).toBe(true)
