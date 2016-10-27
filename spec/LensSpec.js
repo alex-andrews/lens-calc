@@ -2,17 +2,20 @@
 /* eslint-disable no-unused-vars  */
 
 describe('Lens', function () {
+  function isNumeric (val) {
+    return typeof val === 'number' && !isNaN(val)
+  }
   var lens
   beforeEach(function () {
-    lens = new Lens(1.74, 4.5, -5.00, 75)
+    lens = new Lens(1.74, 4.5, -5.00, 75, 1.5)
   })
   describe('Check parameters supplied at instantiation', function () {
     it('should throw an error if the wrong number of parameters are supplied', function () {
       expect(() => { lens = new Lens(1.498, 4.5, 5) })
-      .toThrow(new Error('Lens requires 4 arguments at instantiation, recieved 3'))
+      .toThrow(new Error('Lens requires 5 arguments at instantiation, recieved 3'))
     })
     it('should throw an error if one of the parameters is non-numeric', function () {
-      expect(() => { lens = new Lens('these', 'are', 'not', 'nums') })
+      expect(() => { lens = new Lens('none', 'of', 'these', 'are', 'numbers') })
       .toThrow(new Error('Lens requires numerical parameters at instantiation'))
     })
   })
@@ -62,9 +65,9 @@ describe('Lens', function () {
     })
     it('should alter the blank size from its initial value if not equal', function () {
       lens.blankSize = 70
-      expect(lens._diameter).toBe(70)
+      expect(lens._blankSize).toBe(70)
       lens.blankSize = 80
-      expect(lens._diameter).toBe(80)
+      expect(lens._blankSize).toBe(80)
     })
   })
   describe('Get blank size', function () {
@@ -137,9 +140,9 @@ describe('Lens', function () {
       expect(() => { lens.curvatureCalc('not', 'nums') })
       .toThrow(new Error('curvatureCalc requires numerical parameters, not string, string'))
     })
-    it('should throw an error if attempting to divide by 0', function () {
-      expect(() => { lens.curvatureCalc(1.530, 0) })
-      .toThrow(new Error('power must be non-zero'))
+    it('should return infinity if power is 0', function () {
+      expect(lens.curvatureCalc(1.530, 0))
+      .toBe(Infinity)
     })
     it('should throw an error if the index is not greater than 0', function () {
       expect(() => { lens.curvatureCalc(-1, 4.5) })
@@ -168,8 +171,8 @@ describe('Lens', function () {
       .toThrow(new Error('index must be greater than 0'))
     })
     it('should return the correct power for a surface', function () {
-      var frontPower = lens.surfacePowerCalc(1.74, 117.78)
-      expect(frontPower.toFixed(2)).toBe('6.28')
+      var basePower = lens.surfacePowerCalc(1.74, 117.78)
+      expect(basePower.toFixed(2)).toBe('6.28')
     })
     it('should return higher powers at lower radii', function () {
       var reference = lens.surfacePowerCalc(1.74, 117.78)
@@ -189,7 +192,7 @@ describe('Lens', function () {
     })
   })
   describe('Calculate back surface curvature', function () {
-    it('should return a power which produces the overall power when combined with the front surface', function () {
+    it('should return a power which produces the overall power when combined with the base curve surface', function () {
       var overallPower = lens.spherePower
       var frontPower = lens.frontPower
       expect((lens.backPower + lens.frontPower).toFixed(2))
@@ -201,13 +204,19 @@ describe('Lens', function () {
       expect(() => { lens.sagCalc('not', 'nums') })
       .toThrow(new Error('sagCalc requires numerical parameters, not string, string'))
     })
-    it('should throw an error if a parameter is 0', function () {
+    it('should throw an error if the diameter is 0', function () {
       expect(() => { lens.sagCalc(0, 0) })
-      .toThrow(new Error('sagCalc requires non-zero parameters'))
+      .toThrow(new Error('sagCalc requires non-zero blank size'))
     })
     it('should throw an error for unviable sagitta values', function () {
       expect(() => { lens.sagCalc(35, 70) })
       .toThrow(new Error('Sagitta not calculable using the supplied parameters'))
+    })
+    it('should return 0 if curvature is infinite', function () {
+      expect(lens.sagCalc(Infinity, 70)).toBe(0)
+    })
+    it('should return 0 if curvature is 0', function () {
+      expect(lens.sagCalc(0, 70)).toBe(0)
     })
     it('should return the correct sagitta for a spherical cap', function () {
       expect(lens.sagCalc(100, 50).toFixed(2)).toBe('3.18')
@@ -215,6 +224,44 @@ describe('Lens', function () {
     it('should return greater sagitta values for larger blank sizes', function () {
       var reference = lens.sagCalc(100, 50)
       expect(lens.sagCalc(100, 70)).toBeGreaterThan(reference)
+    })
+  })
+  describe('Calculate maximum thickness', function () {
+    it('should return the correct thickness for a minus lens', function () {
+      lens = new Lens(1.56, 4.5, -6, 70, 1.5)
+      expect(lens.maxThickness.toFixed(1)).toBe('9.7')
+    })
+    it('should return greater thickness values for higher minus powers', function () {
+      var reference = new Lens(1.56, 4.5, -6, 70, 1.5)
+      lens = new Lens(1.56, 4.5, -10, 70, 1.5)
+      expect(lens.maxThickness).toBeGreaterThan(reference.maxThickness)
+    })
+    it('should return the correct thickness for a plus lens', function () {
+      lens = new Lens(1.56, 6, 4.5, 70, 1)
+      expect(lens.maxThickness.toFixed(1)).toBe('6.2')
+    })
+    it('should return greater thickness values for higher plus powers', function () {
+      var reference = new Lens(1.56, 6, 4.5, 70, 1)
+      lens = new Lens(1.56, 6, 5, 70, 1)
+      expect(lens.maxThickness).toBeGreaterThan(reference.maxThickness)
+    })
+  })
+  describe('Lens extreme value assignment', function () {
+    it('should return numerical values for all lens parameters at lowest extreme', function () {
+      lens = new Lens(1, 0, -20, 40, 1.5)
+      expect(isNumeric(lens.backPower)).toBe(true)
+      expect(isNumeric(lens.backSag)).toBe(true)
+      expect(isNumeric(lens.frontPower)).toBe(true)
+      expect(isNumeric(lens.frontSag)).toBe(true)
+      expect(isNumeric(lens.maxThickness)).toBe(true)
+    })
+    it('should return numerical values for all lens parameters at highest extreme', function () {
+      lens = new Lens(2, 9, 20, 85, 1.5)
+      expect(isNumeric(lens.backPower)).toBe(true)
+      expect(isNumeric(lens.backSag)).toBe(true)
+      expect(isNumeric(lens.frontPower)).toBe(true)
+      expect(isNumeric(lens.frontSag)).toBe(true)
+      expect(isNumeric(lens.maxThickness)).toBe(true)
     })
   })
 })

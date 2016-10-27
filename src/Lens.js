@@ -1,19 +1,21 @@
 class Lens { // eslint-disable-line no-unused-vars
-  constructor (lensIndex, baseCurve, spherePower, diameter) {
-    if (arguments.length !== 4) {
-      throw new Error('Lens requires 4 arguments at instantiation, recieved ' + arguments.length)
+  constructor (lensIndex, baseCurve, spherePower, diameter, minThickness) {
+    if (arguments.length !== 5) {
+      throw new Error('Lens requires 5 arguments at instantiation, recieved ' + arguments.length)
     } else if (
       typeof (lensIndex) !== 'number' ||
       typeof (baseCurve) !== 'number' ||
       typeof (spherePower) !== 'number' ||
-      typeof (diameter) !== 'number'
+      typeof (diameter) !== 'number' ||
+      typeof (minThickness) !== 'number'
     ) {
       throw new Error('Lens requires numerical parameters at instantiation')
     }
-    this._index = lensIndex
-    this._blankSize = diameter
-    this._baseCurve = baseCurve
-    this._spherePower = spherePower
+    this.index = lensIndex
+    this.blankSize = diameter
+    this.baseCurve = baseCurve
+    this.spherePower = spherePower
+    this.minThickness = minThickness
   }
   set index (i) {
     if (typeof (i) !== 'number') {
@@ -33,7 +35,7 @@ class Lens { // eslint-disable-line no-unused-vars
     } else if (diameter < 40 || diameter > 85) {
       throw new Error('blank size cannot be < 40 or > 85')
     } else {
-      this._diameter = diameter
+      this._blankSize = diameter
     }
   }
   get blankSize () {
@@ -71,7 +73,7 @@ class Lens { // eslint-disable-line no-unused-vars
     if (typeof (lensIndex) !== 'number' || typeof (power) !== 'number') {
       throw new Error('curvatureCalc requires numerical parameters, not ' + typeof (lensIndex) + ', ' + typeof (power))
     } else if (power === 0) {
-      throw new Error('power must be non-zero')
+      return Infinity
     } else if (lensIndex <= 0) {
       throw new Error('index must be greater than 0')
     } else {
@@ -92,8 +94,10 @@ class Lens { // eslint-disable-line no-unused-vars
   sagCalc (curvature, blankDiameter) {
     if (typeof (curvature) !== 'number' || typeof (blankDiameter) !== 'number') {
       throw new Error('sagCalc requires numerical parameters, not ' + typeof (curvature) + ', ' + typeof (blankDiameter))
-    } else if (curvature === 0 || blankDiameter === 0) {
-      throw new Error('sagCalc requires non-zero parameters')
+    } else if (blankDiameter === 0) {
+      throw new Error('sagCalc requires non-zero blank size')
+    } else if (curvature === Infinity || curvature === 0) {
+      return 0
     } else if (curvature <= blankDiameter / 2) {
       throw new Error('Sagitta not calculable using the supplied parameters')
     }
@@ -109,11 +113,24 @@ class Lens { // eslint-disable-line no-unused-vars
     return this._spherePower - this.frontPower
   }
   get frontSag () {
-    var frontCurvature = this.curvatureCalc(1.530, this._baseCurve)
-    return this.sagCalc(frontCurvature, this._diameter)
+    var frontCurvature = this.curvatureCalc(1.530, this.baseCurve)
+    if (frontCurvature === Infinity) {
+      return 0
+    } else {
+      return this.sagCalc(frontCurvature, this.blankSize)
+    }
   }
   get backSag () {
-    var backCurvature = this.curvatureCalc(this._index, this.backPower)
-    return this.sagCalc(backCurvature, this._diameter)
+    var backCurvature = this.curvatureCalc(this.index, this.backPower)
+    return this.sagCalc(backCurvature, this.blankSize)
+  }
+  get maxThickness () {
+    if (this.spherePower > 0) {
+      // Plus lens
+      return this.frontSag - this.backSag + this.minThickness
+    } else {
+      // Plano || minus lens
+      return this.backSag - this.frontSag + this.minThickness
+    }
   }
 }
