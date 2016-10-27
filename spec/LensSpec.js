@@ -91,10 +91,6 @@ describe('Lens', function () {
       expect(() => { lens.baseCurve = -5 })
       .toThrow(new Error('base curve assignment requires values >= 0'))
     })
-    it('should throw an error if the value is > 9', function () {
-      expect(() => { lens.baseCurve = 10 })
-      .toThrow(new Error('base curve assignment requires values <= 9'))
-    })
     it('should alter the base curve from its initial value if not equal', function () {
       lens.baseCurve = 2
       expect(lens._baseCurve).toBe(2)
@@ -190,6 +186,10 @@ describe('Lens', function () {
       expect(lens.frontPower)
       .toBeGreaterThan(4.24)
     })
+    it('should throw an error if it is exceeded by the spherical power', function () {
+      expect(() => { lens = new Lens(1.498, 5, 8, 75, 1.5) })
+      .toThrow(new Error('Spherical power cannot exceed front surface power'))
+    })
   })
   describe('Calculate back surface curvature', function () {
     it('should return a power which produces the overall power when combined with the base curve surface', function () {
@@ -209,8 +209,8 @@ describe('Lens', function () {
       .toThrow(new Error('sagCalc requires non-zero blank size'))
     })
     it('should throw an error for unviable sagitta values', function () {
-      expect(() => { lens.sagCalc(35, 70) })
-      .toThrow(new Error('Sagitta not calculable using the supplied parameters'))
+      expect(() => { lens.sagCalc(30, 70) })
+      .toThrow(new Error('Sagitta not calculable: Blank radius exceeds curvature radius'))
     })
     it('should return 0 if curvature is infinite', function () {
       expect(lens.sagCalc(Infinity, 70)).toBe(0)
@@ -256,7 +256,7 @@ describe('Lens', function () {
       expect(isNumeric(lens.maxThickness)).toBe(true)
     })
     it('should return numerical values for all lens parameters at highest extreme', function () {
-      lens = new Lens(2, 9, 20, 85, 1.5)
+      lens = new Lens(2, 20, 20, 53, 1.5)
       expect(isNumeric(lens.backPower)).toBe(true)
       expect(isNumeric(lens.backSag)).toBe(true)
       expect(isNumeric(lens.frontPower)).toBe(true)

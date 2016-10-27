@@ -16,6 +16,9 @@ class Lens { // eslint-disable-line no-unused-vars
     this.baseCurve = baseCurve
     this.spherePower = spherePower
     this.minThickness = minThickness
+    if (this.frontPower < spherePower) {
+      throw new Error('Spherical power cannot exceed front surface power')
+    }
   }
   set index (i) {
     if (typeof (i) !== 'number') {
@@ -46,8 +49,6 @@ class Lens { // eslint-disable-line no-unused-vars
       throw new Error('base curve assignment requires numerical input')
     } else if (bc < 0) {
       throw new Error('base curve assignment requires values >= 0')
-    } else if (bc > 9) {
-      throw new Error('base curve assignment requires values <= 9')
     } else {
       this._baseCurve = bc
     }
@@ -98,8 +99,8 @@ class Lens { // eslint-disable-line no-unused-vars
       throw new Error('sagCalc requires non-zero blank size')
     } else if (curvature === Infinity || curvature === 0) {
       return 0
-    } else if (curvature <= blankDiameter / 2) {
-      throw new Error('Sagitta not calculable using the supplied parameters')
+    } else if (curvature < blankDiameter / 2) {
+      throw new Error('Sagitta not calculable: Blank radius exceeds curvature radius')
     }
     var blankRadius = blankDiameter / 2
     var i = Math.pow(curvature, 2) - Math.pow(blankRadius, 2)
