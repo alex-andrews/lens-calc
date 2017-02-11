@@ -1,22 +1,14 @@
-class Lens { // eslint-disable-line no-unused-vars
-  constructor (lensIndex, baseCurve, spherePower, diameter, minThickness) {
-    if (arguments.length !== 5) {
-      throw new Error(`Lens requires 5 arguments at instantiation, recieved ${arguments.length}`)
-    } else if (
-      typeof (lensIndex) !== 'number' ||
-      typeof (baseCurve) !== 'number' ||
-      typeof (spherePower) !== 'number' ||
-      typeof (diameter) !== 'number' ||
-      typeof (minThickness) !== 'number'
-    ) {
-      throw new Error('Lens requires numerical parameters at instantiation')
+var Lens = class { // eslint-disable-line no-unused-vars
+  constructor (spec) {
+    if (!spec.minThickness) { // Provide a minimum thickness if not supplied
+      spec.minThickness = spec.index > 1.498 ? 1.5 : 2
     }
-    this.index = lensIndex
-    this.blankSize = diameter
-    this.baseCurve = baseCurve
-    this.spherePower = spherePower
-    this.minThickness = minThickness
-    if (this.frontPower < spherePower) {
+    this.index = spec.index
+    this.blankSize = spec.diameter
+    this.baseCurve = spec.baseCurve
+    this.spherePower = spec.sphere
+    this.minThickness = spec.minThickness
+    if (this.frontPower < spec.sphere) {
       throw new Error('Spherical power cannot exceed front surface power')
     }
   }
@@ -127,11 +119,11 @@ class Lens { // eslint-disable-line no-unused-vars
   }
   get maxThickness () {
     if (this.spherePower > 0) {
-      // Plus lens
+        // Plus lens
       return this.frontSag - this.backSag + this.minThickness
     } else {
-      // Plano || minus lens
+        // Plano || minus lens
       return this.backSag - this.frontSag + this.minThickness
     }
   }
-}
+  }
