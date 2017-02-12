@@ -11,7 +11,7 @@ describe('Lens', function () {
       sphere: -5.00,
       cyl: -2.5,
       axis: 90,
-      diameter: 75,
+      blankSize: 75,
       index: 1.74,
       baseCurve: 4.5,
       minThickness: 1.5
@@ -23,7 +23,7 @@ describe('Lens', function () {
         sphere: -5.00,
         cyl: -2.5,
         axis: 90,
-        diameter: 75,
+        blankSize: 75,
         index: 1.74,
         baseCurve: 4.5
       })
@@ -34,7 +34,7 @@ describe('Lens', function () {
         sphere: -5.00,
         cyl: -2.5,
         axis: 90,
-        diameter: 75,
+        blankSize: 75,
         index: 1.74,
         baseCurve: 4.5
       })
@@ -58,20 +58,20 @@ describe('Lens', function () {
       }).toThrow(new Error('setIndex parameter cannot be < 1.49 or > 2'))
     })
     it('should alter the index from its initial value if not equal', function () {
-      lens._index = 1.498 // Set initial value
+      lens.index = 1.498 // Set initial value
       lens.index = 1.74 // attempt to set it
-      expect(lens._index).toBe(1.74)
+      expect(lens.index).toBe(1.74)
     })
   })
   describe('Get lens index', function () {
     it('should return the current index value', function () {
       let ref = 1.5
-      lens._index = ref
+      lens.index = ref
       expect(lens.index).toBe(ref)
     })
     it('should not always return the same value', function () {
       let ref = 1.74
-      lens._index = ref
+      lens.index = ref
       expect(lens.index).toBe(ref)
     })
   })
@@ -93,20 +93,20 @@ describe('Lens', function () {
     })
     it('should alter the blank size from its initial value if not equal', function () {
       lens.blankSize = 70
-      expect(lens._blankSize).toBe(70)
+      expect(lens.blankSize).toBe(70)
       lens.blankSize = 80
-      expect(lens._blankSize).toBe(80)
+      expect(lens.blankSize).toBe(80)
     })
   })
   describe('Get blank size', function () {
     it('should return the current blank size', function () {
       let ref = 65
-      lens._blankSize = ref
+      lens.blankSize = ref
       expect(lens.blankSize).toBe(ref)
     })
     it('should not always return the same value', function () {
       let ref = 70
-      lens._blankSize = ref
+      lens.blankSize = ref
       expect(lens.blankSize).toBe(ref)
     })
   })
@@ -123,44 +123,44 @@ describe('Lens', function () {
     })
     it('should alter the base curve from its initial value if not equal', function () {
       lens.baseCurve = 2
-      expect(lens._baseCurve).toBe(2)
+      expect(lens.baseCurve).toBe(2)
       lens.baseCurve = 4
-      expect(lens._baseCurve).toBe(4)
+      expect(lens.baseCurve).toBe(4)
     })
   })
   describe('Get base curve', function () {
     it('should return the current base curve', function () {
       let ref = 3
-      lens._baseCurve = ref
+      lens.baseCurve = ref
       expect(lens.baseCurve).toBe(ref)
     })
     it('should not always return the same value', function () {
       let ref = 4
-      lens._baseCurve = ref
+      lens.baseCurve = ref
       expect(lens.baseCurve).toBe(ref)
     })
   })
   describe('Set the spherical power', function () {
     it('should throw an error if the value is non-numeric', function () {
       expect(() => {
-        lens.spherePower = 'string'
+        lens.sphere = 'string'
       }).toThrow(new Error('sphere power assignment requires numerical input'))
     })
     it('should throw an error if the value is < -20', function () {
       expect(() => {
-        lens.spherePower = -30
+        lens.sphere = -30
       }).toThrow(new Error('sphere power assignment requires values >= -20'))
     })
     it('should throw an error if the value is > 20', function () {
       expect(() => {
-        lens.spherePower = 30
+        lens.sphere = 30
       }).toThrow(new Error('sphere power assignment requires values <= 20'))
     })
     it('should alter the spherical power from its initial value if not equal', function () {
-      lens.spherePower = 5
-      expect(lens._spherePower).toBe(5)
-      lens.spherePower = 7
-      expect(lens._spherePower).toBe(7)
+      lens.sphere = 5
+      expect(lens.sphere).toBe(5)
+      lens.sphere = 7
+      expect(lens.sphere).toBe(7)
     })
   })
   describe('Calculate surface curvature', function () {
@@ -213,7 +213,7 @@ describe('Lens', function () {
   describe('Calculate front surface power', function () {
     it('should return the correct power for a front surface', function () {
       lens.index = 1.498
-      expect((lens.frontPower).toFixed(2)).toBe('4.23')
+      expect((lens.frontPower).toFixed(2)).toBe('4.28')
     })
     it('should return a higher power for high index lenses', function () {
       lens.index = 1.74
@@ -225,7 +225,7 @@ describe('Lens', function () {
           index: 1.498,
           baseCurve: 5,
           sphere: 8,
-          diameter: 75,
+          blankSize: 75,
           minThickness: 1.5
         })
       }).toThrow(new Error('Spherical power cannot exceed front surface power'))
@@ -233,7 +233,7 @@ describe('Lens', function () {
   })
   describe('Calculate back surface curvature', function () {
     it('should return a power which produces the overall power when combined with the base curve surface', function () {
-      var overallPower = lens.spherePower
+      var overallPower = lens.sphere
       var frontPower = lens.frontPower
       expect((lens.backPower + lens.frontPower).toFixed(2)).toBe(overallPower.toFixed(2))
     })
@@ -275,7 +275,7 @@ describe('Lens', function () {
         index: 1.56,
         baseCurve: 4.5,
         sphere: -6.00,
-        diameter: 70,
+        blankSize: 70,
         minThickness: 1.5
       })
       expect(lens.maxThickness.toFixed(1)).toBe('9.7')
@@ -285,14 +285,14 @@ describe('Lens', function () {
         index: 1.56,
         baseCurve: 4.5,
         sphere: -6.00,
-        diameter: 70,
+        blankSize: 70,
         minThickness: 1.5
       })
       lens = new Lens({
         index: 1.56,
         baseCurve: 4.5,
         sphere: -10.00,
-        diameter: 70,
+        blankSize: 70,
         minThickness: 1.5
       })
       expect(lens.maxThickness).toBeGreaterThan(reference.maxThickness)
@@ -302,7 +302,7 @@ describe('Lens', function () {
         index: 1.56,
         baseCurve: 6,
         sphere: 4.5,
-        diameter: 70,
+        blankSize: 70,
         minThickness: 1
       })
       expect(lens.maxThickness.toFixed(1)).toBe('6.2')
@@ -312,14 +312,14 @@ describe('Lens', function () {
         index: 1.56,
         baseCurve: 6,
         sphere: 4.5,
-        diameter: 70,
+        blankSize: 70,
         minThickness: 1
       })
       lens = new Lens({
         index: 1.56,
         baseCurve: 6,
         sphere: 5,
-        diameter: 70,
+        blankSize: 70,
         minThickness: 1
       })
       expect(lens.maxThickness).toBeGreaterThan(reference.maxThickness)
@@ -331,7 +331,7 @@ describe('Lens', function () {
         index: 1.498,
         baseCurve: 0,
         sphere: -20,
-        diameter: 40,
+        blankSize: 40,
         minThickness: 1.5
       })
       expect(isNumeric(lens.backPower)).toBe(true)
@@ -345,7 +345,7 @@ describe('Lens', function () {
         index: 1.498,
         baseCurve: 25,
         sphere: 20,
-        diameter: 40,
+        blankSize: 40,
         minThickness: 1.5
       })
       expect(isNumeric(lens.backPower)).toBe(true)
