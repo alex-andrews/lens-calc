@@ -163,6 +163,56 @@ describe('Lens', function () {
       expect(lens.sphere).toBe(7)
     })
   })
+  describe('Set the cylindrical power', function () {
+    it('should throw an error if the value is non-numeric', function () {
+      expect(() => {
+        lens.cylinder = 'string'
+      }).toThrow(new Error('cylinder power assignment requires numerical input'))
+    })
+    it('should alter the cylindrical power from its initial value if not equal', function () {
+      lens.cylinder = -2
+      expect(lens.cylinder).toBe(-2)
+      lens.cylinder = -5
+      expect(lens.cylinder).toBe(-5)
+    })
+  })
+  describe('Get the cylindrical power', function () {
+    it('should return the current cylindrical power', function () {
+      let ref = -2
+      lens.cylinder = ref
+      expect(lens.cylinder).toBe(ref)
+    })
+    it('should not always return the same value', function () {
+      let ref = -5
+      lens.cylinder = ref
+      expect(lens.cylinder).toBe(ref)
+    })
+  })
+  describe('Set the axis', function () {
+    it('should throw an error if the value is non-numeric', function () {
+      expect(() => {
+        lens.axis = 'string'
+      }).toThrow(new Error('axis assignment requires numerical input'))
+    })
+    it('should alter the axis from its initial value if not equal', function () {
+      let ref = 10
+      lens.axis = ref
+      expect(lens.axis).toBe(ref)
+      ref = 50
+      lens.axis = ref
+      expect(lens.axis).toBe(ref)
+    })
+    it('should throw an error if the value provided is < 0', function () {
+      expect(() => {
+        lens.axis = -5
+      }).toThrow(new Error('axis assignment requires input values of 0 - 180 degrees'))
+    })
+    it('should throw an error if the value provided is > 180', function () {
+      expect(() => {
+        lens.axis = 200
+      }).toThrow(new Error('axis assignment requires input values of 0 - 180 degrees'))
+    })
+  })
   describe('Calculate surface curvature', function () {
     it('should throw an error if a parameter is non-numeric', function () {
       expect(() => {
